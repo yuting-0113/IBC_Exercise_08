@@ -1,8 +1,32 @@
 #Exercise 08:
-#Analysis of data surrounding sports teams has grown into a major business for the teams themselves and the media. One cool summary plot that media outlets generate to summarize a game, in this case basketball, is a line graph depicting the cumulative score for each team as a function of time in the game (see below):
+#Question1:
+#Load the file into score dataframe:
+score <- read.table(file= "UWvMSU_1-22-13.txt", header = TRUE)
+
+#Generate a subset of each group:   
+UWscore <- subset(score, team == "UW")   
+UWscore <- UWscore[order(UWscore[,3]),]
+MSUscore <- subset(score, team == "MSU")
+MSUscore <- MSUscore[order(MSUscore[,3]),]
 
 
+#Generate the cumulative score of each group:
+Y_UWscore <- UWscore$time
+Y_MSUscore <- MSUscore$time
+#For UW:
+for (i in 2: nrow(UWscore)){
+  Y_UWscore[i] <- Y_UWscore[i-1] + UWscore$time[i]
+}
+#For MSU:
+for (i in 2: nrow(MSUscore)){
+  Y_MSUscore[i] <- Y_MSUscore[i-1] + MSUscore$time[i]
+}
 
+#Generate the plot for UW:
+plot(1:nrow(UWscore),Y_UWscore, type="l")
+lines(1:nrow(MSUscore),Y_MSUscore)
+
+#How to change the x-axis?
 
 
 
