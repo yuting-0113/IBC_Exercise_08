@@ -3,34 +3,36 @@
 #Load the file into score dataframe:
 score <- read.table(file= "UWvMSU_1-22-13.txt", header = TRUE)
 
-#Generate a subset of each group:   
-UWscore <- subset(score, team == "UW")   
-UWscore <- UWscore[order(UWscore[,1]),]
-MSUscore <- subset(score, team == "MSU")
-MSUscore <- MSUscore[order(MSUscore[,1]),]
 
+#create a matrix to store the culmulative scores for UW and MSU:
+newscore <-  matrix(nrow = nrow(score)+1, ncol = 3)
+colnames(newscore) <- c("time","UWscore","MSUscore")  # name the each column;
+# when time is 0, UWscore =0 and MSUscore=0;
+newscore[1,1] <- 0   
+newscore[1,2] <- 0
+newscore[1,3] <- 0
 
-#Generate the cumulative score of each group:
-Y_UWscore <- UWscore$score
-Y_MSUscore <- MSUscore$score
-#For UW:
-for (i in 2: nrow(UWscore)){
-  Y_UWscore[i] <- Y_UWscore[i-1] + UWscore$score[i]
-}
-#For MSU:
-for (i in 2: nrow(MSUscore)){
-  Y_MSUscore[i] <- Y_MSUscore[i-1] + MSUscore$score[i]
+#load the time column of score into newscore:
+for (i in 1:nrow(score)){
+  newscore[i+1,1] <- score[i,1]  
 }
 
-#print cumulative scores of each group to check whether it is correct:
-Y_UWscore
-Y_MSUscore
-
+# Load the cumulative scores into newscore:
+for (i in 2: nrow(newscore)){
+  if (score$team[i-1] == "UW"){      #if UW is scored, UWscore column add that score and MSUscore column add 0;
+    newscore[i,2] <- newscore[i-1,2] + score[i-1,3]  
+    newscore[i,3] <- newscore[i-1,3] + 0
+  }else {                                              #if MSU is scored, MSUscore column add that score and UWscore column add 0;
+    newscore[i,3] <- newscore[i-1,3] + score[i-1,3]
+    newscore[i,2] <- newscore[i-1,2] + 0
+  }
+}
 
 #Generate the plot for each group:
-plot(UWscore$time,Y_UWscore, type="l", xlab = "Time", ylab = "Score")      # plot for UW
-lines(MSUscore$time,Y_MSUscore)   #add a second line for MSU
-
+plot(newscore[,1],newscore[,2], type="l", xlab = "Time", ylab = "Score", col ='red')   # plot UW cumulative scores
+lines(newscore[,1],newscore[,3], col = 'blue')   #add a second line for MSU
+# Add a legend
+legend('topleft', legend=c("UW", "MSU"), col=c("red", "blue"), lwd = 1)
 
 
 
